@@ -163,7 +163,7 @@ const SelectionStatusBar = () => {
               borderColorScheme='main'
               borderRadius='2xl'
               borderBottomThickness={8}
-              className='py-2 px-4 bg-[var(--main-color)]/80 w-1/5'
+              className='py-3 px-4 bg-[var(--main-color)]/80 w-auto'
               onClick={handleClear}
               aria-label='Clear selected levels'
             >
