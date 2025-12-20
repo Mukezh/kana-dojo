@@ -35,7 +35,7 @@ const animationKeyframes = `
     opacity: 1;
   }
   50% {
-    opacity: 0.25;
+    opacity: 0.3;
   }
 }
 `;
@@ -65,22 +65,14 @@ const GRID_CONFIG = {
   mobile: { cols: 10, cellSize: 36, gap: 2 } // grid-cols-10
 };
 
-// Scatter animation configuration - base layer of random pulsing
-const SCATTER_CONFIG = {
-  frequency: 5000, // Trigger new scatter burst every 5 seconds
-  scatterCount: 90, // Number of random characters to animate (~11% of desktop grid)
-  pulseDuration: 3500, // Duration of each pulse animation in ms (faster for more visibility)
-  minOpacity: 0.25, // More pronounced pulse (0.25-1.0 instead of 0.5-1.0)
-  overlap: true // Allow overlap between bursts for continuous movement
-};
-
-// Wave animation configuration - traveling accent layer
-const WAVE_CONFIG = {
-  frequency: 12000, // Trigger new wave every 12 seconds
-  waveWidth: 5, // Number of columns in the wave (4-5 columns wide)
-  waveDuration: 3000, // How long the wave takes to travel across grid
-  waveInterval: 50, // Update wave position every 50ms for smooth travel
-  boostCount: 40 // Additional characters animated in wave columns
+// Gradual animation configuration - peaceful, zen-like continuous cycling
+const ANIMATION_CONFIG = {
+  baseCount: 100, // ~100 characters animating at any given time (~13% of desktop grid)
+  turnoverFrequency: 2500, // Every 2.5 seconds, cycle some characters
+  turnoverCount: 20, // Remove and add 20 characters each cycle (gradual change)
+  pulseDuration: 4500, // 4.5s pulse for peaceful, breathing effect
+  minOpacity: 0.3, // Noticeable but not harsh (0.3-1.0)
+  transitionDuration: 1200 // 1.2s smooth fade in/out when starting/stopping
 };
 
 // Calculate how many characters to render based on viewport
@@ -315,11 +307,11 @@ const StaticChar = memo(({ style, isAnimating = false }: StaticCharProps) => (
       color: style.color,
       contentVisibility: 'auto',
       containIntrinsicSize: '36px',
-      // Smooth transition when animation starts/stops
-      transition: 'opacity 0.8s ease-in-out',
-      // Custom breathe animation with enhanced visibility
+      // Smooth transition when animation starts/stops - longer for peaceful effect
+      transition: `opacity ${ANIMATION_CONFIG.transitionDuration}ms ease-in-out`,
+      // Custom breathe animation - peaceful, zen-like pulsing
       ...(isAnimating && {
-        animation: `breathe ${SCATTER_CONFIG.pulseDuration}ms ease-in-out infinite`
+        animation: `breathe ${ANIMATION_CONFIG.pulseDuration}ms ease-in-out infinite`
       })
     }}
   >
@@ -349,7 +341,6 @@ const Decorations = ({
   const [animatingIndices, setAnimatingIndices] = useState<Set<number>>(
     new Set()
   );
-  const [waveColumn, setWaveColumn] = useState<number>(-1); // Current wave column (-1 = no wave)
   const { playClick } = useClick();
 
   // Store latest playClick in ref to keep handleExplode stable
@@ -419,12 +410,12 @@ const Decorations = ({
     };
   }, []);
 
-  // Random scatter burst animation - only in static (non-interactive) mode
+  // Gradual continuous animation cycling - peaceful zen-like effect
   useEffect(() => {
-    // Only run scatter animation in static mode
+    // Only run in static mode
     if (interactive || styles.length === 0) return;
 
-    // Helper function to select random unique indices
+    // Helper: Select random unique indices
     const selectRandomIndices = (count: number, max: number): Set<number> => {
       const indices = new Set<number>();
       while (indices.size < Math.min(count, max)) {
@@ -433,90 +424,61 @@ const Decorations = ({
       return indices;
     };
 
-    // Trigger initial scatter immediately
+    // Helper: Remove N random items from a set
+    const removeRandomFromSet = (set: Set<number>, count: number): Set<number> => {
+      const array = Array.from(set);
+      const toRemove = new Set<number>();
+      while (toRemove.size < Math.min(count, array.length)) {
+        toRemove.add(array[Math.floor(Math.random() * array.length)]);
+      }
+      return new Set(array.filter(item => !toRemove.has(item)));
+    };
+
+    // Helper: Add N random indices to a set (avoiding duplicates)
+    const addRandomToSet = (
+      set: Set<number>,
+      count: number,
+      max: number
+    ): Set<number> => {
+      const newSet = new Set(set);
+      while (newSet.size < Math.min(set.size + count, max)) {
+        newSet.add(Math.floor(Math.random() * max));
+      }
+      return newSet;
+    };
+
+    // Initialize with base count
     const initialIndices = selectRandomIndices(
-      SCATTER_CONFIG.scatterCount,
+      ANIMATION_CONFIG.baseCount,
       styles.length
     );
     setAnimatingIndices(initialIndices);
 
-    // Set up interval for subsequent scatter bursts
-    const scatterInterval = setInterval(() => {
-      const newIndices = selectRandomIndices(
-        SCATTER_CONFIG.scatterCount,
-        styles.length
-      );
-      setAnimatingIndices(newIndices);
-    }, SCATTER_CONFIG.frequency);
+    // Gradual turnover: every 2.5s, remove some and add some
+    const turnoverInterval = setInterval(() => {
+      setAnimatingIndices(currentIndices => {
+        // Remove random subset
+        let updated = removeRandomFromSet(
+          currentIndices,
+          ANIMATION_CONFIG.turnoverCount
+        );
+        // Add new random subset
+        updated = addRandomToSet(
+          updated,
+          ANIMATION_CONFIG.turnoverCount,
+          styles.length
+        );
+        return updated;
+      });
+    }, ANIMATION_CONFIG.turnoverFrequency);
 
     return () => {
-      clearInterval(scatterInterval);
+      clearInterval(turnoverInterval);
       setAnimatingIndices(new Set());
     };
   }, [interactive, styles.length]);
 
-  // Traveling wave animation - accent layer that sweeps across grid
-  useEffect(() => {
-    // Only run wave in static mode
-    if (interactive || styles.length === 0) return;
-
-    // Determine columns based on device (28 desktop, 10 mobile)
-    const cols = visibleCount > 400 ? GRID_CONFIG.desktop.cols : GRID_CONFIG.mobile.cols;
-
-    // Trigger waves periodically
-    const waveTimer = setInterval(() => {
-      let currentCol = 0;
-      const steps = cols + WAVE_CONFIG.waveWidth;
-      const stepDuration = WAVE_CONFIG.waveDuration / steps;
-
-      // Animate wave traveling left to right
-      const waveInterval = setInterval(() => {
-        setWaveColumn(currentCol);
-        currentCol++;
-
-        if (currentCol >= cols + WAVE_CONFIG.waveWidth) {
-          clearInterval(waveInterval);
-          setWaveColumn(-1); // Reset wave
-        }
-      }, stepDuration);
-    }, WAVE_CONFIG.frequency);
-
-    return () => {
-      clearInterval(waveTimer);
-      setWaveColumn(-1);
-    };
-  }, [interactive, styles.length, visibleCount]);
-
-  // Calculate combined animating indices (scatter + wave)
-  const combinedAnimatingIndices = useMemo(() => {
-    if (interactive || styles.length === 0) return new Set<number>();
-
-    const combined = new Set(animatingIndices);
-
-    // Add wave characters if wave is active
-    if (waveColumn >= 0) {
-      const cols = visibleCount > 400 ? GRID_CONFIG.desktop.cols : GRID_CONFIG.mobile.cols;
-      const rows = Math.ceil(visibleCount / cols);
-
-      // Calculate which columns are in the wave
-      for (let col = Math.max(0, waveColumn - WAVE_CONFIG.waveWidth); col <= waveColumn; col++) {
-        if (col >= cols) continue;
-
-        // Add random characters from this column
-        for (let row = 0; row < rows; row++) {
-          const index = row * cols + col;
-          if (index < styles.length && Math.random() < 0.7) {
-            // 70% chance to animate chars in wave
-            combined.add(index);
-          }
-        }
-      }
-    }
-
-    return combined;
-  }, [animatingIndices, waveColumn, interactive, styles.length, visibleCount]);
-
-  // Memoize grid content - now using separate components for interactive vs static
+  // Memoize grid content - using separate components for interactive vs static
   const gridContent = useMemo(() => {
     if (styles.length === 0) return null;
 
@@ -527,16 +489,16 @@ const Decorations = ({
         <InteractiveChar key={index} style={style} onExplode={handleExplode} />
       ));
     } else {
-      // Static mode: random scatter + wave animation - only selected chars animate
+      // Static mode: gradual cycling animation - peaceful, zen-like breathing
       return styles.map((style, index) => (
         <StaticChar
           key={index}
           style={style}
-          isAnimating={combinedAnimatingIndices.has(index)}
+          isAnimating={animatingIndices.has(index)}
         />
       ));
     }
-  }, [styles, interactive, handleExplode, combinedAnimatingIndices]);
+  }, [styles, interactive, handleExplode, animatingIndices]);
 
   if (styles.length === 0) return null;
 
