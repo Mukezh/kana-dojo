@@ -202,7 +202,7 @@ module.exports = {
         'Open [`features/Preferences/data/themes.ts`](../blob/main/features/Preferences/data/themes.ts)',
         'Find the `Dark` themes section (around line 243)',
         'Add this new theme to the array:',
-        'Run the app locally (`npm run dev`) and verify the theme looks good',
+        'Save the file and commit the changes',
         'Submit a Pull Request with title: `feat(theme): add {name} theme`',
         'Link this issue using `Closes #<issue_number>`'
       ],
@@ -222,8 +222,7 @@ module.exports = {
         'Open [`public/japan-facts.json`](../blob/main/public/japan-facts.json)',
         'Add this fact to the end of the array (before the closing `]`)',
         'Make sure to add a comma after the previous last item',
-        'Properly escape any special characters in the text',
-        'Keep the formatting consistent',
+        'Save the file and commit the changes',
         'Submit a Pull Request with title: `content: add japan fact #{id}`',
         'Link this issue using `Closes #<issue_number>`'
       ],
