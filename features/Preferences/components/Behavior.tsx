@@ -3,16 +3,7 @@ import clsx from 'clsx';
 import { buttonBorderStyles } from '@/shared/lib/styles';
 import usePreferencesStore from '@/features/Preferences/store/usePreferencesStore';
 import { useClick } from '@/shared/hooks/useAudio';
-import {
-  AudioLines,
-  VolumeX,
-  Volume2,
-  RefreshCw,
-  Play,
-  Zap,
-  ZapOff,
-} from 'lucide-react';
-import useCrazyModeStore from '@/features/CrazyMode/store/useCrazyModeStore';
+import { AudioLines, VolumeX, Volume2, RefreshCw, Play } from 'lucide-react';
 import { useJapaneseTTS } from '@/shared/hooks/useJapaneseTTS';
 // import{Command, KeyboardOff} from 'lucide-react'
 // import HotkeyReference from './HotkeyReference';
@@ -28,36 +19,36 @@ const Behavior = () => {
 
   // Pronunciation settings
   const pronunciationEnabled = usePreferencesStore(
-    state => state.pronunciationEnabled,
+    state => state.pronunciationEnabled
   );
   const setPronunciationEnabled = usePreferencesStore(
-    state => state.setPronunciationEnabled,
+    state => state.setPronunciationEnabled
   );
   const pronunciationSpeed = usePreferencesStore(
-    state => state.pronunciationSpeed,
+    state => state.pronunciationSpeed
   );
   const setPronunciationSpeed = usePreferencesStore(
-    state => state.setPronunciationSpeed,
+    state => state.setPronunciationSpeed
   );
   const pronunciationPitch = usePreferencesStore(
-    state => state.pronunciationPitch,
+    state => state.pronunciationPitch
   );
   const setPronunciationPitch = usePreferencesStore(
-    state => state.setPronunciationPitch,
+    state => state.setPronunciationPitch
   );
   const furiganaEnabled = usePreferencesStore(state => state.furiganaEnabled);
   const setFuriganaEnabled = usePreferencesStore(
-    state => state.setFuriganaEnabled,
+    state => state.setFuriganaEnabled
   );
   const themePreview = usePreferencesStore(state => state.themePreview);
   const setThemePreview = usePreferencesStore(state => state.setThemePreview);
 
   type Prefs = ReturnType<typeof usePreferencesStore.getState>;
   const pronunciationVoiceName = usePreferencesStore(
-    (state: Prefs) => state.pronunciationVoiceName,
+    (state: Prefs) => state.pronunciationVoiceName
   );
   const setPronunciationVoiceName = usePreferencesStore(
-    (state: Prefs) => state.setPronunciationVoiceName,
+    (state: Prefs) => state.setPronunciationVoiceName
   );
 
   const {
@@ -66,7 +57,7 @@ const Behavior = () => {
     setVoice,
     speak,
     refreshVoices,
-    hasJapaneseVoices,
+    hasJapaneseVoices
   } = useJapaneseTTS();
 
   /*   const hotkeysOn = useThemeStore(state => state.hotkeysOn);
@@ -91,7 +82,7 @@ const Behavior = () => {
             'text-center text-lg',
             'w-1/2 p-4 md:w-1/4',
             'text-[var(--secondary-color)]',
-            'flex-1 overflow-hidden',
+            'flex-1 overflow-hidden'
           )}
           onClick={() => {
             playClick();
@@ -109,7 +100,7 @@ const Behavior = () => {
             'text-center text-lg',
             'w-1/2 p-4 md:w-1/4',
             'text-[var(--secondary-color)]',
-            'flex-1 overflow-hidden',
+            'flex-1 overflow-hidden'
           )}
           onClick={() => {
             playClick();
@@ -133,7 +124,7 @@ const Behavior = () => {
             'w-1/2 p-4 md:w-1/4',
             'flex flex-row items-end justify-center gap-1.5',
             'text-[var(--secondary-color)]',
-            'flex-1 overflow-hidden',
+            'flex-1 overflow-hidden'
           )}
           onClick={() => {
             playClick();
@@ -155,7 +146,7 @@ const Behavior = () => {
             'w-1/2 p-4 md:w-1/4',
             'flex flex-row items-end justify-center gap-1.5',
             'text-[var(--secondary-color)]',
-            'flex-1 overflow-hidden',
+            'flex-1 overflow-hidden'
           )}
           onClick={() => {
             playClick();
@@ -180,7 +171,7 @@ const Behavior = () => {
             'w-1/2 p-4 md:w-1/4',
             'flex flex-row items-end justify-center gap-1.5',
             'text-[var(--secondary-color)]',
-            'flex-1 overflow-hidden',
+            'flex-1 overflow-hidden'
           )}
           onClick={() => {
             playClick();
@@ -202,7 +193,7 @@ const Behavior = () => {
             'w-1/2 p-4 md:w-1/4',
             'flex flex-row items-end justify-center gap-1.5',
             'text-[var(--secondary-color)]',
-            'flex-1 overflow-hidden',
+            'flex-1 overflow-hidden'
           )}
           onClick={() => {
             playClick();
@@ -228,7 +219,7 @@ const Behavior = () => {
             'w-1/2 p-4 md:w-1/4',
             'flex flex-row items-end justify-center gap-1.5',
             'text-[var(--secondary-color)]',
-            'flex-1 overflow-hidden',
+            'flex-1 overflow-hidden'
           )}
           onClick={() => {
             playClick();
@@ -250,7 +241,7 @@ const Behavior = () => {
             'w-1/2 p-4 md:w-1/4',
             'flex flex-row items-end justify-center gap-1.5',
             'text-[var(--secondary-color)]',
-            'flex-1 overflow-hidden',
+            'flex-1 overflow-hidden'
           )}
           onClick={() => {
             playClick();
@@ -338,7 +329,7 @@ const Behavior = () => {
                   await speak('こんにちは', {
                     rate: pronunciationSpeed,
                     pitch: pronunciationPitch,
-                    volume: 0.8,
+                    volume: 0.8
                   });
                 }}
                 title='Test voice'
@@ -524,60 +515,6 @@ const Behavior = () => {
           </div>
         </>
       )}
-
-      <h4 className='text-lg'>Crazy Mode (Experimental):</h4>
-      <div className='flex flex-row gap-4'>
-        <button
-          className={clsx(
-            buttonBorderStyles,
-            'text-center text-lg',
-            'w-1/2 p-4 md:w-1/4',
-            'flex flex-row items-end justify-center gap-1.5',
-            'text-[var(--secondary-color)]',
-            'flex-1 overflow-hidden',
-          )}
-          onClick={() => {
-            playClick();
-            const currentState = useCrazyModeStore.getState().isCrazyMode;
-            if (!currentState) {
-              useCrazyModeStore.getState().toggleCrazyMode();
-            }
-          }}
-        >
-          <span>
-            <span className='text-[var(--main-color)]'>
-              {useCrazyModeStore(state => state.isCrazyMode) && '\u2B24 '}
-            </span>
-            on
-          </span>
-          <Zap size={20} className='mb-0.5' />
-        </button>
-        <button
-          className={clsx(
-            buttonBorderStyles,
-            'text-center text-lg',
-            'w-1/2 p-4 md:w-1/4',
-            'flex flex-row items-end justify-center gap-1.5',
-            'text-[var(--secondary-color)]',
-            'flex-1 overflow-hidden',
-          )}
-          onClick={() => {
-            playClick();
-            const currentState = useCrazyModeStore.getState().isCrazyMode;
-            if (currentState) {
-              useCrazyModeStore.getState().toggleCrazyMode();
-            }
-          }}
-        >
-          <span>
-            <span className='text-[var(--main-color)]'>
-              {!useCrazyModeStore(state => state.isCrazyMode) && '\u2B24 '}
-            </span>
-            off
-          </span>
-          <ZapOff size={20} className='mb-0.5' />
-        </button>
-      </div>
       {/* 
       <h4 className='text-lg'>Enable theme preview on hover:</h4>
       <div className='flex flex-row gap-4'>

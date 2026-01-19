@@ -1,7 +1,9 @@
-import useCrazyModeStore from '../store/useCrazyModeStore';
+import useCrazyModeStore, { KYOKI_THEME_ID } from '../store/useCrazyModeStore';
+import usePreferencesStore from '@/features/Preferences/store/usePreferencesStore';
 
 export const useCrazyModeTrigger = () => {
-  const isCrazyMode = useCrazyModeStore(state => state.isCrazyMode);
+  const selectedTheme = usePreferencesStore(state => state.theme);
+  const isCrazyMode = selectedTheme === KYOKI_THEME_ID;
   const randomize = useCrazyModeStore(state => state.randomize);
 
   const trigger = () => {
